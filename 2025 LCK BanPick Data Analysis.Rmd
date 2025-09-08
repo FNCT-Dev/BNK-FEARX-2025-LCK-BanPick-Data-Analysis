@@ -26,7 +26,7 @@ library(tinytex)
 
 # 데이터베이스 원본 정제 및 사전작업
 
-## Step 1. 원본 데이터 내 LCK 데이터 추출 (DB)
+## 1. 원본 데이터 내 LCK 데이터 추출 (DB)
 
 ```{r, warning=FALSE}
 league <- read_csv("data/2025_LoL_esports_match_data_from_OraclesElixir.csv", show_col_types = FALSE)
@@ -36,7 +36,7 @@ lck_clean <- lck %>%
   select(gameid, year:patch, side:playername, teamname, champion:last_col())
 ```
 
-## Step 2. BFX 경기목록 추출 (Value)
+## 2. BFX 경기목록 추출 (Value)
 
 ```{r}
 bfx_gameid <- lck_clean %>%
@@ -47,9 +47,9 @@ bfx_gameid <- lck_clean %>%
 
 ------------------------------------------------------------------------
 
-# BFX 시점의 밴률, 픽률 데이터 추출
+# BFX 시점의 밴/픽률
 
-## Step 1. BFX 팀 단위, 선수 단위 데이터 추출 및 정제
+## 1. 팀/선수 단위 데이터 추출 및 정제
 
 ```{r}
 bfx_only_team <- lck_clean %>%
@@ -63,7 +63,7 @@ bfx_only_player <- lck_clean %>%
   write_csv("data/Only/20250907 BNK FEARX Only Player.csv")
 ```
 
-## Step 2. BFX 팀 단위 밴 데이터 추출
+## 2. 밴 데이터 추출
 
 ```{r}
 bfx_only_team_ban <- bfx_only_team %>%
@@ -84,7 +84,7 @@ bfx_only_team_ban_top30_labelw10 <- bfx_only_team_ban_top30 %>%
   write_csv("data/Only/Ban/20250907 BNK FEARX Only Team Ban Top30 Labelw10.csv")
 ```
 
-### Step 2.1. BFX 상위 30개 밴 횟수 및 밴률 그래프
+### 2.1. 밴 횟수 및 밴률 그래프
 
 ```{r}
 ggplot(bfx_only_team_ban_top30_labelw10) +
@@ -106,7 +106,7 @@ ggplot(bfx_only_team_ban_top30_labelw10) +
   theme_minimal()
 ```
 
-## Step 3. BFX 선수별 픽 데이터 추출
+## 3. 선수별 픽 데이터 추출
 
 ```{r}
 bfx_only_player_pick <- bfx_only_player %>%
@@ -158,7 +158,7 @@ bfx_only_player_pick_5_sup_kellin <- bfx_only_player_pick %>%
   write_csv("data/Only/Pick/20250907 BNK FEARX Only Player Pick 5 SPT Kellin.csv")
 ```
 
-### Step 3.1. BFX 선수별 픽률 및 승률 그래프
+### 3.1. 픽률 및 승률 그래프
 
 #### Clear (TOP, 주전)
 
@@ -302,9 +302,9 @@ ggplot(bfx_only_player_pick_5_sup_kellin) +
 
 ------------------------------------------------------------------------
 
-# 상대 팀 시점의 밴률, 픽률 데이터 추출
+# 상대 팀 시점의 밴/픽률
 
-## Step 1. 상대 팀의 대 BFX전 데이터 추출 및 정제
+## 1. 데이터 추출 및 정제
 
 ```{r}
 bfx_vs_team <- lck_clean %>%
@@ -318,7 +318,7 @@ bfx_vs_player <- lck_clean %>%
   write_csv("data/Versus/20250907 BNK FEARX Versus Player.csv")
 ```
 
-## Step 2. 상대 팀의 대 BFX전 밴 데이터 추출
+## 2. 밴 데이터 추출
 
 ```{r}
 bfx_vs_team_ban <- bfx_vs_team %>%
@@ -339,7 +339,7 @@ bfx_vs_team_ban_top30_labelw10 <- bfx_vs_team_ban_top30 %>%
   write_csv("data/Versus/Ban/20250907 BNK FEARX Versus Team Ban Top30 Labelw10.csv")
 ```
 
-### Step 2.1. 상대 팀의 대 BFX전 상위 30개 밴 횟수 및 밴률 그래프
+### 2.1. 밴 횟수 및 밴률 그래프
 
 ```{r}
 ggplot(bfx_vs_team_ban_top30_labelw10) +
@@ -361,7 +361,7 @@ ggplot(bfx_vs_team_ban_top30_labelw10) +
   theme_minimal()
 ```
 
-## Step 3. 상대 팀의 대 BFX전 포지션별 픽 데이터 추출
+## 3. 포지션별 픽 데이터 추출
 
 ```{r}
 bfx_vs_player_pick <- bfx_vs_player %>%
@@ -401,7 +401,7 @@ bfx_vs_player_pick_5_sup <- bfx_vs_player_pick %>%
   write_csv("data/Versus/Pick/20250907 BNK FEARX Versus Player Pick 5 SPT.csv")
 ```
 
-### Step 3.1. 대 BFX전 포지션별 픽률 및 승률 그래프
+### 3.1. 픽률 및 승률 그래프
 
 #### TOP
 
@@ -505,9 +505,9 @@ ggplot(bfx_vs_player_pick_5_sup) +
 
 ------------------------------------------------------------------------
 
-# 종합형 밴률, 픽률 데이터 추출
+# 종합형 밴/픽률
 
-## Step 1. BFX전 종합 데이터 추출 및 정제
+## 1. 데이터 추출 및 정제
 
 ```{r}
 bfx_combi_team <- lck_clean %>%
@@ -521,7 +521,7 @@ bfx_combi_player <- lck_clean %>%
   write_csv("data/Combined/20250907 BNK FEARX Combined Player.csv")
 ```
 
-## Step 2. BFX전 종합 밴 데이터 추출
+## 2. 밴 데이터 추출
 
 ```{r}
 bfx_combi_team_ban <- bfx_combi_team %>%
@@ -542,7 +542,7 @@ bfx_combi_team_ban_top30_labelw10 <- bfx_combi_team_ban_top30 %>%
   write_csv("data/Combined/Ban/20250907 BNK FEARX Combined Team Ban Top30 Labelw10.csv")
 ```
 
-### Step 2.1. BFX전 종합 상위 30개 밴 횟수 및 밴률 그래프
+### 2.1. 밴 횟수 및 밴률 그래프
 
 ```{r, fig.width=8, fig.height=6, out.width='0.9\\textwidth'}
 ggplot(bfx_combi_team_ban_top30_labelw10) +
@@ -564,7 +564,7 @@ ggplot(bfx_combi_team_ban_top30_labelw10) +
   theme_minimal()
 ```
 
-## Step 3. BFX전 종합 포지션별 픽 데이터 추출
+## 3. 포지션별 픽 데이터 추출
 
 ```{r}
 bfx_combi_player_pick <- bfx_combi_player %>%
@@ -604,7 +604,7 @@ bfx_combi_player_pick_5_sup <- bfx_combi_player_pick %>%
   write_csv("data/Combined/Pick/20250907 BNK FEARX Combined Player Pick 5 SPT.csv")
 ```
 
-### Step 3.1. BFX전 종합 픽률 및 승률 그래프
+### 3.1. 픽률 및 승률 그래프
 
 #### TOP
 
@@ -708,13 +708,11 @@ ggplot(bfx_combi_player_pick_5_sup) +
 
 ------------------------------------------------------------------------
 
-# 응용 데이터 추출
+# 포지션별 픽 조합
 
-## Step 1. BFX전 픽 조합 데이터 추출 및 정제
+## 1. 정글-미드 조합
 
-### Step 1.1. 정글-미드 조합
-
-#### Step 1.1.1. BFX 시점
+### 1.1. BFX 시점
 
 ```{r}
 bfx_comp_only_collab_jugmid <- bfx_only_player %>%
@@ -734,9 +732,7 @@ ggplot(bfx_comp_only_collab_jugmid) +
   theme_minimal()
 ```
 
-
-
-#### Step 1.1.2. 상대 팀 시점
+### 1.2. 상대 팀 시점
 
 ```{r}
 bfx_comp_vs_collab_jugmid <- bfx_vs_player %>%
@@ -757,7 +753,7 @@ ggplot(bfx_comp_vs_collab_jugmid) +
   theme_minimal()
 ```
 
-#### Step 1.1.3. BFX전 종합
+### 1.3. BFX전 종합
 
 ```{r}
 bfx_comp_combi_collab_jugmid <- bfx_combi_player %>%
@@ -777,9 +773,71 @@ ggplot(bfx_comp_combi_collab_jugmid) +
   theme_minimal()
 ```
 
-### Step 1.2. 원딜-서폿 조합
+## 2. 탑-정글 조합
 
-#### Step 1.2.1. BFX 시점
+### 2.1. BFX 시점
+
+```{r}
+bfx_comp_only_collab_topjug <- bfx_only_player %>%
+  filter(teamname == "BNK FEARX", position %in% c("top", "jng")) %>%
+  select(gameid, position, playername, champion, result:ckpm) %>%
+  pivot_wider(id_cols = c(gameid,result), names_from = position,values_from = champion) %>%
+  group_by(top, jng) %>%
+  summarise(games = n(), wins = sum(result == 1, na.rm = TRUE), winrate = wins / games, .groups = "drop") %>%
+  arrange(desc(games)) %>%
+  write_csv("data/Complicated/20250907 BNK FEARX Complicated Only Collaboration TOPJUG.csv")
+
+ggplot(bfx_comp_only_collab_topjug) +
+  aes(x = top, y = jng, size = games, color = winrate) +
+  geom_point(alpha = 0.7) +
+  scale_color_gradient(low = "#d50110", high = "#ffd100", labels = scales::percent_format(accuracy = 1)) +
+  labs(title = "BFX 탑-정글 조합 승률 & 게임 수", x = "TOP", y = "JUG", size = "게임 수", color = "승률") +
+  theme_minimal()
+```
+
+### 2.2. 상대 팀 시점
+
+```{r}
+bfx_comp_vs_collab_topjug <- bfx_vs_player %>%
+  filter(teamname != "BNK FEARX", position %in% c("top", "jng")) %>%
+  select(gameid, position:teamname, champion, result:ckpm) %>%
+  pivot_wider(id_cols = c(gameid,result), names_from = position, values_from = champion) %>%
+  group_by(top, jng) %>%
+  summarise(games = n(), wins = sum(result == 1, na.rm = TRUE), winrate = wins / games, .groups = "drop") %>%
+  arrange(desc(games)) %>%
+  write_csv("data/Complicated/20250907 BNK FEARX Complicated Versus Collaboration TOPJUG.csv")
+
+ggplot(bfx_comp_vs_collab_topjug) +
+  aes(x = top, y = jng, size = games, color = winrate) +
+  geom_point(alpha = 0.7) +
+  scale_color_gradient(low = "#d50110", high = "#ffd100", labels = scales::percent_format(accuracy = 1)) +
+  labs(title = "상대 팀 탑-정글 조합 승률 & 게임 수", x = "TOP", y = "JUG", size = "게임 수", color = "승률") +
+  theme_minimal()
+```
+
+### 2.3. BFX전 종합
+
+```{r}
+bfx_comp_combi_collab_topjug <- bfx_combi_player %>%
+  filter(position %in% c("top", "jng")) %>%
+  select(gameid, position:teamname, champion, result:ckpm) %>%
+  pivot_wider(id_cols = c(gameid,result), names_from = position, values_from = champion) %>%
+  group_by(top, jng) %>%
+  summarise(games = n(), wins = sum(result == 1, na.rm = TRUE), winrate = wins / games, .groups = "drop") %>%
+  arrange(desc(games)) %>%
+  write_csv("data/Complicated/20250907 BNK FEARX Complicated Combinated Collaboration TOPJUG.csv")
+
+ggplot(bfx_comp_combi_collab_topjug) +
+  aes(x = top, y = jng, size = games, color = winrate) +
+  geom_point(alpha = 0.7) +
+  scale_color_gradient(low = "#d50110", high = "#ffd100", labels = scales::percent_format(accuracy = 1)) +
+  labs(title = "BFX전 종합 정글-미드 조합 승률 & 게임 수", x = "TOP", y = "JUG", size = "게임 수", color = "승률") +
+  theme_minimal()
+```
+
+## 3. 원딜-서폿 조합
+
+### 3.1. BFX 시점
 
 ```{r}
 bfx_comp_only_collab_adcspt <- bfx_only_player %>%
@@ -799,7 +857,7 @@ ggplot(bfx_comp_only_collab_adcspt) +
   theme_minimal()
 ```
 
-#### Step 1.2.2. 상대 팀 시점
+### 3.2. 상대 팀 시점
 
 ```{r}
 bfx_comp_vs_collab_adcspt <- bfx_vs_player %>%
@@ -819,7 +877,7 @@ ggplot(bfx_comp_vs_collab_adcspt) +
   theme_minimal()
 ```
 
-#### Step 1.2.3. BFX전 종합
+### 3.3. BFX전 종합
 
 ```{r}
 bfx_comp_combi_collab_adcspt <- bfx_combi_player %>%
@@ -839,11 +897,13 @@ ggplot(bfx_comp_combi_collab_adcspt) +
   theme_minimal()
 ```
 
-## Step 2. BFX전 상대 진영 별 픽 데이터
+------------------------------------------------------------------------
 
-### Step 2.1. 블루 진영 기준 모스트 픽 및 1픽
+# 진영별 픽 분석
 
-#### Step 2.1.1. BFX 시점 데이터 추출
+## 1. 블루 진영 기준 모스트 픽 및 1픽
+
+### 1.1. BFX 시점 데이터 추출
 
 ```{r}
 bfx_comp_only_blue <- bfx_only_team %>%
@@ -852,7 +912,7 @@ bfx_comp_only_blue <- bfx_only_team %>%
   write_csv("data/Complicated/20250907 BNK FEARX Complicated Only Blueside.csv")
 ```
 
-##### Step 2.1.1.1. BFX 시점 블루 진영 전체 모스트 픽 데이터
+#### 1.1.1. 블루 진영 전체 모스트 픽 데이터
 
 ```{r}
 bfx_comp_only_blue_pickpref <- bfx_comp_only_blue %>%
@@ -872,7 +932,7 @@ bfx_comp_only_blue_pickpref_top30_labelw10 <- bfx_comp_only_blue_pickpref_top30 
   write_csv("data/Complicated/20250907 BNK FEARX Complicated Only Blueside Pickpref Top30 Labelw10.csv")
 ```
 
-###### Step 2.1.1.1.1. BFX 시점 블루 진영 전체 모스트 픽 그래프
+##### 1.1.1.1. 전체 모스트 픽 그래프
 
 ```{r}
 ggplot(bfx_comp_only_blue_pickpref_top30_labelw10) +
@@ -885,7 +945,7 @@ ggplot(bfx_comp_only_blue_pickpref_top30_labelw10) +
   theme_minimal()
 ```
 
-##### Step 2.1.1.2. BFX 시점 블루 진영 1픽 모스트 픽 데이터
+#### 1.1.2. 1픽 모스트 픽 데이터
 
 ```{r}
 bfx_comp_only_blue_1st <- bfx_comp_only_blue %>%
@@ -895,7 +955,7 @@ bfx_comp_only_blue_1st <- bfx_comp_only_blue %>%
   write_csv("data/Complicated/20250907 BNK FEARX Complicated Only Blueside 1st.csv")
 ```
 
-###### Step 2.1.1.2.1. BFX 시점 블루 진영 1픽 모스트 픽 그래프
+##### 1.1.2.1. 1픽 모스트 픽 그래프
 
 ```{r}
 ggplot(bfx_comp_only_blue_1st) +
@@ -907,7 +967,7 @@ ggplot(bfx_comp_only_blue_1st) +
   theme_minimal()
 ```
 
-#### Step 2.1.2. 상대 팀 시점 데이터 추출
+### 1.2. 상대 팀 시점 데이터 추출
 
 ```{r}
 bfx_comp_vs_blue <- bfx_vs_team %>%
@@ -916,7 +976,7 @@ bfx_comp_vs_blue <- bfx_vs_team %>%
   write_csv("data/Complicated/20250907 BNK FEARX Complicated Versus Blueside.csv")
 ```
 
-##### Step 2.1.2.1. 상대 팀 시점 블루 진영 전체 모스트 픽
+#### 1.2.1. 전체 모스트 픽
 
 ```{r}
 bfx_comp_vs_blue_pickpref <- bfx_comp_vs_blue %>%
@@ -936,7 +996,7 @@ bfx_comp_vs_blue_pickpref_top30_labelw10 <- bfx_comp_vs_blue_pickpref_top30 %>%
   write_csv("data/Complicated/20250907 BNK FEARX Complicated Versus Blueside Pickpref Top30 Labelw10.csv")
 ```
 
-###### Step 2.1.2.1.1. 상대 팀 시점 블루 진영 전체 모스트 픽 그래프
+##### 1.2.1.1. 전체 모스트 픽 그래프
 
 ```{r}
 ggplot(bfx_comp_vs_blue_pickpref_top30_labelw10) +
@@ -949,7 +1009,7 @@ ggplot(bfx_comp_vs_blue_pickpref_top30_labelw10) +
   theme_minimal()
 ```
 
-##### Step 2.1.2.2. 상대 팀 시점 블루 진영 1픽 모스트 픽
+#### 1.2.2. 1픽 모스트 픽
 
 ```{r}
 bfx_comp_vs_blue_1st <- bfx_comp_vs_blue %>%
@@ -959,7 +1019,7 @@ bfx_comp_vs_blue_1st <- bfx_comp_vs_blue %>%
   write_csv("data/Complicated/20250907 BNK FEARX Complicated Versus Blueside 1st.csv")
 ```
 
-###### Step 2.1.2.2.1. 상대 팀 시점 블루 진영 1픽 모스트 픽 그래프
+##### 1.2.2.1. 1픽 모스트 픽 그래프
 
 ```{r}
 ggplot(bfx_comp_vs_blue_1st) +
@@ -971,7 +1031,7 @@ ggplot(bfx_comp_vs_blue_1st) +
   theme_minimal()
 ```
 
-#### Step 2.1.3. BFX전 종합 데이터 추출
+### 1.3. BFX전 종합 데이터 추출
 
 ```{r}
 bfx_comp_combi_blue <- bfx_combi_team %>%
@@ -980,7 +1040,7 @@ bfx_comp_combi_blue <- bfx_combi_team %>%
   write_csv("data/Complicated/20250907 BNK FEARX Complicated Combined Blueside.csv")
 ```
 
-##### Step 2.1.3.1. BFX전 종합 블루 진영 전체 모스트 픽
+#### 1.3.1. 전체 모스트 픽
 
 ```{r}
 bfx_comp_combi_blue_pickpref <- bfx_comp_combi_blue %>%
@@ -1000,7 +1060,7 @@ bfx_comp_combi_blue_pickpref_top30_labelw10 <- bfx_comp_combi_blue_pickpref_top3
   write_csv("data/Complicated/20250907 BNK FEARX Complicated Combined Blueside Pickpref Top30 Labelw10.csv")
 ```
 
-###### Step 2.1.2.1.1. BFX전 종합 블루 진영 전체 모스트 픽 그래프
+##### 1.2.1.1. 전체 모스트 픽 그래프
 
 ```{r}
 ggplot(bfx_comp_combi_blue_pickpref_top30_labelw10) +
@@ -1013,7 +1073,7 @@ ggplot(bfx_comp_combi_blue_pickpref_top30_labelw10) +
   theme_minimal()
 ```
 
-##### Step 2.1.2.2. BFX전 종합 블루 진영 1픽 모스트 픽
+#### 1.2.2. 1픽 모스트 픽
 
 ```{r}
 bfx_comp_combi_blue_1st <- bfx_comp_combi_blue %>%
@@ -1023,7 +1083,7 @@ bfx_comp_combi_blue_1st <- bfx_comp_combi_blue %>%
   write_csv("data/Complicated/20250907 BNK FEARX Complicated Combined Blueside 1st.csv")
 ```
 
-###### Step 2.1.2.2.1. BFX전 종합 블루 진영 1픽 모스트 픽 그래프
+##### 1.2.2.1. 1픽 모스트 픽 그래프
 
 ```{r}
 ggplot(bfx_comp_combi_blue_1st) +
@@ -1035,9 +1095,9 @@ ggplot(bfx_comp_combi_blue_1st) +
   theme_minimal()
 ```
 
-### Step 2.2. 레드 진영 기준 모스트 픽 및 5픽
+## 2. 레드 진영 기준 모스트 픽 및 5픽
 
-#### Step 2.1.1. BFX 시점 데이터 추출
+### 2.1. BFX 시점 데이터 추출
 
 ```{r}
 bfx_comp_only_red <- bfx_only_team %>%
@@ -1046,7 +1106,7 @@ bfx_comp_only_red <- bfx_only_team %>%
   write_csv("data/Complicated/20250907 BNK FEARX Complicated Only Redside.csv")
 ```
 
-##### Step 2.1.1.1. BFX 시점 레드 진영 전체 모스트 픽 데이터
+#### 2.1.1. 전체 모스트 픽 데이터
 
 ```{r}
 bfx_comp_only_red_pickpref <- bfx_comp_only_red %>%
@@ -1066,7 +1126,7 @@ bfx_comp_only_red_pickpref_top30_labelw10 <- bfx_comp_only_red_pickpref_top30 %>
   write_csv("data/Complicated/20250907 BNK FEARX Complicated Only Redside Pickpref Top30 Labelw10.csv")
 ```
 
-###### Step 2.1.1.1.1. BFX 시점 레드 진영 전체 모스트 픽 그래프
+##### 2.1.1.1. 전체 모스트 픽 그래프
 
 ```{r}
 ggplot(bfx_comp_only_red_pickpref_top30_labelw10) +
@@ -1079,7 +1139,7 @@ ggplot(bfx_comp_only_red_pickpref_top30_labelw10) +
   theme_minimal()
 ```
 
-##### Step 2.1.1.2. BFX 시점 레드 진영 1픽 모스트 픽 데이터
+#### 2.1.2. 1픽 모스트 픽 데이터
 
 ```{r}
 bfx_comp_only_red_1st <- bfx_comp_only_red %>%
@@ -1089,7 +1149,7 @@ bfx_comp_only_red_1st <- bfx_comp_only_red %>%
   write_csv("data/Complicated/20250907 BNK FEARX Complicated Only Redside 1st.csv")
 ```
 
-###### Step 2.1.1.2.1. BFX 시점 레드 진영 1픽 모스트 픽 그래프
+##### 2.1.2.1. 1픽 모스트 픽 그래프
 
 ```{r}
 ggplot(bfx_comp_only_red_1st) +
@@ -1101,7 +1161,7 @@ ggplot(bfx_comp_only_red_1st) +
   theme_minimal()
 ```
 
-#### Step 2.1.2. 상대 팀 시점 데이터 추출
+### 2.2. 상대 팀 시점 데이터 추출
 
 ```{r}
 bfx_comp_vs_red <- bfx_vs_team %>%
@@ -1110,7 +1170,7 @@ bfx_comp_vs_red <- bfx_vs_team %>%
   write_csv("data/Complicated/20250907 BNK FEARX Complicated Versus Redside.csv")
 ```
 
-##### Step 2.1.2.1. 상대 팀 시점 레드 진영 전체 모스트 픽
+#### 2.2.1. 전체 모스트 픽
 
 ```{r}
 bfx_comp_vs_red_pickpref <- bfx_comp_vs_red %>%
@@ -1130,7 +1190,7 @@ bfx_comp_vs_red_pickpref_top30_labelw10 <- bfx_comp_vs_red_pickpref_top30 %>%
   write_csv("data/Complicated/20250907 BNK FEARX Complicated Versus Redside Pickpref Top30 Labelw10.csv")
 ```
 
-###### Step 2.1.2.1.1. 상대 팀 시점 레드 진영 전체 모스트 픽 그래프
+##### 2.2.1.1. 전체 모스트 픽 그래프
 
 ```{r}
 ggplot(bfx_comp_vs_red_pickpref_top30_labelw10) +
@@ -1143,7 +1203,7 @@ ggplot(bfx_comp_vs_red_pickpref_top30_labelw10) +
   theme_minimal()
 ```
 
-##### Step 2.1.2.2. 상대 팀 시점 레드 진영 1픽 모스트 픽
+#### 2.2.2. 1픽 모스트 픽
 
 ```{r}
 bfx_comp_vs_red_1st <- bfx_comp_vs_red %>%
@@ -1153,7 +1213,7 @@ bfx_comp_vs_red_1st <- bfx_comp_vs_red %>%
   write_csv("data/Complicated/20250907 BNK FEARX Complicated Versus Redside 1st.csv")
 ```
 
-###### Step 2.1.2.2.1. 상대 팀 시점 레드 진영 1픽 모스트 픽 그래프
+##### 2.2.2.1. 1픽 모스트 픽 그래프
 
 ```{r}
 ggplot(bfx_comp_vs_red_1st) +
@@ -1165,7 +1225,7 @@ ggplot(bfx_comp_vs_red_1st) +
   theme_minimal()
 ```
 
-#### Step 2.1.3. BFX전 종합 데이터 추출
+### 2.3. BFX전 종합 데이터 추출
 
 ```{r}
 bfx_comp_combi_red <- bfx_combi_team %>%
@@ -1174,7 +1234,7 @@ bfx_comp_combi_red <- bfx_combi_team %>%
   write_csv("data/Complicated/20250907 BNK FEARX Complicated Combined Redside.csv")
 ```
 
-##### Step 2.1.3.1. BFX전 종합 레드 진영 전체 모스트 픽
+#### 2.3.1. 전체 모스트 픽
 
 ```{r}
 bfx_comp_combi_red_pickpref <- bfx_comp_combi_red %>%
@@ -1194,7 +1254,7 @@ bfx_comp_combi_red_pickpref_top30_labelw10 <- bfx_comp_combi_red_pickpref_top30 
   write_csv("data/Complicated/20250907 BNK FEARX Complicated Combined Redside Pickpref Top30 Labelw10.csv")
 ```
 
-###### Step 2.1.2.1.1. BFX전 종합 레드 진영 전체 모스트 픽 그래프
+##### 2.3.1.1. 전체 모스트 픽 그래프
 
 ```{r}
 ggplot(bfx_comp_combi_red_pickpref_top30_labelw10) +
@@ -1207,7 +1267,7 @@ ggplot(bfx_comp_combi_red_pickpref_top30_labelw10) +
   theme_minimal()
 ```
 
-##### Step 2.1.2.2. BFX전 종합 레드 진영 1픽 모스트 픽
+#### 2.3.2. 1픽 모스트 픽
 
 ```{r}
 bfx_comp_combi_red_1st <- bfx_comp_combi_red %>%
@@ -1217,7 +1277,7 @@ bfx_comp_combi_red_1st <- bfx_comp_combi_red %>%
   write_csv("data/Complicated/20250907 BNK FEARX Complicated Combined Redside 1st.csv")
 ```
 
-###### Step 2.1.2.2.1. BFX전 종합 레드 진영 1픽 모스트 픽 그래프
+##### 2.3.2.1. 1픽 모스트 픽 그래프
 
 ```{r}
 ggplot(bfx_comp_combi_red_1st) +
@@ -1228,3 +1288,55 @@ ggplot(bfx_comp_combi_red_1st) +
   labs(title = "BFX전 종합 레드 진영 1픽 모스트 픽", x = "챔피언", y = "횟수") +
   theme_minimal()
 ```
+
+------------------------------------------------------------------------
+
+# 카운터 밴픽
+
+## 1. 탑 카운터
+
+## 2. 정글 카운터
+
+## 3. 미드 카운터
+
+## 4. 원딜 카운터
+
+## 5. 서폿 카운터
+
+------------------------------------------------------------------------
+
+# 패치별 밴픽 변화
+
+## 1. LCK CUP (v25.01~v25.02)
+
+## 2. LCK 1R~2R (v25.06~v25.10)
+
+## 3. LCK 3R~PO (v25.14~v25.17)
+
+### 3.1. LCK 3R 유나라 글로벌 밴 (v25.14)
+
+### 3.2. LCK 4R~PO 유나라 글로벌 밴 해제 이후 (v25.15~v25.17)
+
+------------------------------------------------------------------------
+
+# 인게임 운영데이터
+
+## 1. 경기 시간대별 승률
+
+## 2. 퍼블/피퍼블 확률별 승률
+
+## 3. CKPM 구간별 승률
+
+------------------------------------------------------------------------
+
+# 주전 선수별 데이터
+
+## 1. Clear (TOP)
+
+## 2. Raptor (JUG)
+
+## 3. VicLa (MID)
+
+## 4. Diable (ADC)
+
+## 5. Kellin (SPT)

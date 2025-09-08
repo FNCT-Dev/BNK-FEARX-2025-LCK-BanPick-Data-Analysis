@@ -1,0 +1,49 @@
+gameid,patch,pick1,pick2,pick3,pick4,pick5,gamelength,result,kills,deaths,assists,teamkills,teamdeaths,doublekills,triplekills,quadrakills,pentakills,firstblood,team kpm,ckpm,firstdragon,dragons,opp_dragons,elementaldrakes,opp_elementaldrakes,infernals,mountains,clouds,oceans,chemtechs,hextechs
+LOLTMNT03_184105,15.01,Ambessa,Rakan,Xayah,Akali,Jarvan IV,1771,0,6,16,19,6,16,1,0,0,0,0,0.2033,0.7453,0,1,3,1,3,0,0,1,0,0,0
+LOLTMNT03_188641,15.01,Rumble,Varus,Vi,Renata Glasc,Yone,1649,0,3,23,6,3,23,0,0,0,0,1,0.1092,0.946,1,2,2,2,2,0,1,0,1,0,0
+LOLTMNT03_188655,15.01,Xin Zhao,Kalista,Neeko,Renekton,Galio,1568,0,7,24,17,7,24,0,0,0,0,1,0.2679,1.1862,1,2,1,2,1,1,0,1,0,0,0
+LOLTMNT03_191023,15.01,Ezreal,Leona,Jax,Wukong,Taliyah,1809,0,3,17,5,3,17,0,0,0,0,0,0.0995,0.6633,1,1,4,1,4,0,0,0,0,0,1
+LOLTMNT03_191030,15.01,Corki,Sejuani,Zeri,Yuumi,Aurora,2044,0,7,18,19,7,18,1,0,0,0,0,0.2055,0.7339,1,2,3,2,3,0,1,1,0,0,0
+LOLTMNT01_198801,15.02,Jayce,Poppy,Kai'Sa,Wukong,Viktor,1655,0,11,23,19,11,23,1,0,0,0,0,0.3988,1.2326,0,1,1,1,1,0,0,0,1,0,0
+LOLTMNT02_242946,15.06,K'Sante,Vi,Azir,Ashe,Braum,2215,0,12,18,34,12,18,1,0,0,0,1,0.3251,0.8126,1,3,3,3,3,2,0,1,0,0,0
+LOLTMNT02_244356,15.06,Naafiri,Ambessa,Ezreal,Sylas,Elise,1930,0,8,22,18,8,22,1,0,0,0,0,0.2487,0.9326,1,3,1,3,1,1,1,1,0,0,0
+LOLTMNT02_244383,15.06,Azir,Skarner,Leona,Kai'Sa,Fiora,1499,1,15,6,34,15,6,2,1,0,0,0,0.6004,0.8406,1,3,0,3,0,1,1,1,0,0,0
+LOLTMNT03_218633,15.07,Ezreal,Ahri,Renekton,Viego,Leona,2001,1,23,10,48,23,10,3,1,0,0,0,0.6897,0.9895,1,4,1,4,1,1,0,2,0,0,1
+LOLTMNT03_222019,15.07,Taliyah,Xin Zhao,Sion,Rakan,Xayah,1799,0,9,17,18,9,17,0,0,0,0,1,0.3002,0.8671,0,1,3,1,3,0,0,0,0,1,0
+LOLTMNT03_221634,15.07,Miss Fortune,Lillia,Rell,Ambessa,Galio,1575,0,8,24,20,8,24,0,0,0,0,0,0.3048,1.219,1,1,3,1,3,0,0,1,0,0,0
+LOLTMNT03_229164,15.07,Xayah,Rakan,Renekton,Viego,Sylas,1810,0,11,29,15,11,29,1,1,0,0,0,0.3646,1.326,0,2,2,2,2,1,0,0,0,1,0
+LOLTMNT03_230810,15.07,Sion,Viego,Ahri,Alistar,Zeri,1712,1,14,3,31,14,3,0,0,0,0,1,0.4907,0.5958,1,2,1,2,1,0,0,1,0,1,0
+LOLTMNT01_228803,15.08,Varus,Rumble,Skarner,Yone,Renata Glasc,1832,0,15,30,40,15,30,1,0,0,0,0,0.4913,1.4738,1,2,3,2,3,0,1,0,0,0,1
+LOLTMNT01_232663,15.08,Jayce,Azir,Ezreal,Poppy,Karma,2403,0,18,17,32,18,17,2,0,0,0,1,0.4494,0.8739,1,4,1,4,0,0,1,1,0,2,0
+LOLTMNT01_233535,15.08,Viktor,Pantheon,Jax,Alistar,Lucian,1807,1,15,5,37,15,5,2,1,0,0,0,0.4981,0.6641,1,4,0,4,0,0,1,0,0,2,1
+LOLTMNT01_239535,15.08,Azir,Xin Zhao,Rumble,Leona,Kai'Sa,2141,0,22,26,46,22,26,4,0,0,0,1,0.6165,1.3452,1,3,2,3,2,1,1,1,0,0,0
+LOLTMNT02_258642,15.09,Taliyah,Xin Zhao,Xayah,Alistar,Ambessa,1769,0,11,14,21,11,14,0,0,0,0,1,0.3731,0.8479,1,3,1,3,1,1,0,0,0,1,1
+LOLTMNT02_262780,15.09,Azir,Gwen,Ezreal,Wukong,Leona,2140,0,10,15,18,10,15,1,1,0,0,0,0.2804,0.7009,0,2,3,2,3,1,0,0,1,0,0
+LOLTMNT02_265989,15.09,Sion,Lucian,Milio,Maokai,Tristana,1633,0,10,17,26,10,17,2,0,0,0,1,0.3674,0.992,0,0,4,0,4,0,0,0,0,0,0
+LOLTMNT02_268539,15.09,Rumble,Taliyah,Wukong,Ezreal,Neeko,1946,0,7,24,15,7,24,1,1,1,0,1,0.2158,0.9558,1,3,2,3,2,0,0,0,1,1,1
+LOLTMNT03_241674,15.1,Xin Zhao,Neeko,Ezreal,Annie,Olaf,1697,0,11,21,25,11,21,1,0,0,0,1,0.3889,1.1314,1,1,3,1,3,0,0,0,1,0,0
+LOLTMNT03_244951,15.1,Yorick,Xin Zhao,Akali,Leona,Kai'Sa,2149,0,18,21,41,18,21,2,0,0,0,0,0.5026,1.0889,0,3,3,3,3,0,2,0,0,0,1
+LOLTMNT03_248153,15.1,Ryze,Yorick,Wukong,Rakan,Jhin,1719,0,7,20,17,7,20,0,0,0,0,1,0.2443,0.9424,0,1,3,1,3,0,0,0,0,1,0
+LOLTMNT03_253707,15.1,Xin Zhao,Varus,Ahri,Ambessa,Renata Glasc,1619,0,13,19,34,13,19,1,0,0,0,1,0.4818,1.1859,1,2,2,2,2,1,0,1,0,0,0
+LOLTMNT01_266226,15.14,Taliyah,Vi,Rumble,Alistar,Kai'Sa,1798,1,11,7,25,11,7,2,0,0,0,0,0.3671,0.6007,1,4,0,4,0,1,2,0,1,0,0
+LOLTMNT01_266234,15.14,Annie,Wukong,Yorick,Sivir,Rell,1720,1,16,13,43,16,13,1,0,0,0,1,0.5581,1.0116,0,0,3,0,3,0,0,0,0,0,0
+LOLTMNT01_268648,15.14,Lucian,Taliyah,Braum,Ambessa,Jarvan IV,1966,0,9,19,23,9,19,0,0,0,0,1,0.2747,0.8545,1,2,2,2,2,0,1,1,0,0,0
+LOLTMNT01_272463,15.14,Renekton,Orianna,Nocturne,Alistar,Kai'Sa,1830,1,27,16,79,27,16,4,0,0,0,1,0.8852,1.4098,0,3,2,3,2,3,0,0,0,0,0
+LOLTMNT01_273365,15.14,Vi,Ryze,Neeko,Corki,K'Sante,2097,0,21,28,53,21,28,3,1,0,0,0,0.6009,1.402,1,2,3,2,3,0,1,0,1,0,0
+LOLTMNT02_295398,15.15,Wukong,Rumble,Taliyah,Yunara,Rakan,1917,1,15,8,49,15,8,4,0,0,0,0,0.4695,0.7199,0,3,2,3,2,0,3,0,0,0,0
+LOLTMNT02_294485,15.15,Orianna,Xin Zhao,Jhin,Ambessa,Bard,2433,1,21,15,54,21,15,1,0,0,0,1,0.5179,0.8878,0,2,4,2,4,0,1,0,0,1,0
+LOLTMNT02_296421,15.15,Trundle,Kai'Sa,Renekton,Ahri,Rell,1950,1,16,8,46,16,8,2,0,0,0,0,0.4923,0.7385,1,3,1,3,1,0,0,0,2,1,0
+LOLTMNT02_301669,15.15,Ryze,Nocturne,Aatrox,Rakan,Kai'Sa,1702,0,8,24,19,8,24,0,0,0,0,0,0.282,1.1281,0,0,4,0,4,0,0,0,0,0,0
+LOLTMNT02_303157,15.15,Gwen,Xin Zhao,Galio,Lucian,Braum,1861,0,10,23,21,10,23,2,0,0,0,1,0.3224,1.0639,1,2,2,2,2,0,0,0,1,0,1
+LOLTMNT02_302398,15.15,Vi,Sion,Cassiopeia,Karma,Zeri,1800,0,3,22,6,3,22,0,0,0,0,0,0.1,0.8333,1,2,2,2,2,0,0,1,0,1,0
+LOLTMNT03_284666,15.16,Rumble,Taliyah,Xin Zhao,Rakan,Kai'Sa,1761,1,23,9,68,23,9,4,2,0,0,1,0.7836,1.0903,1,4,0,4,0,0,2,0,1,1,0
+LOLTMNT03_284695,15.16,Renekton,Vi,Alistar,Viktor,Jhin,1807,0,12,22,28,12,22,1,1,0,0,1,0.3985,1.1289,0,2,2,2,2,0,1,1,0,0,0
+LOLTMNT03_291596,15.16,Yunara,Annie,Xin Zhao,Lulu,Renekton,2033,1,21,11,66,21,11,4,2,0,0,0,0.6198,0.9444,0,3,1,3,1,1,2,0,0,0,0
+LOLTMNT03_291623,15.16,Sion,Jarvan IV,Ryze,Sivir,Rakan,1821,1,25,19,74,25,19,5,1,0,0,0,0.8237,1.4498,1,3,1,3,1,0,1,0,0,1,1
+LOLTMNT03_294392,15.16,Sion,Yone,Sylas,Kalista,Renata Glasc,1919,1,24,15,68,24,15,4,2,1,0,1,0.7504,1.2194,1,4,1,4,1,0,0,0,1,3,0
+LOLTMNT01_281588,15.17,Taliyah,Xin Zhao,Ambessa,Alistar,Sivir,1827,0,12,22,24,12,22,0,0,0,0,0,0.3941,1.1166,0,0,4,0,4,0,0,0,0,0,0
+LOLTMNT01_281603,15.17,Lucian,Sion,Braum,Ryze,Naafiri,1643,1,29,3,87,29,3,7,3,0,0,1,1.059,1.1686,1,3,0,3,0,0,1,0,1,1,0
+LOLTMNT01_280961,15.17,Rumble,Wukong,Rakan,Galio,Vayne,2281,0,13,18,37,13,18,0,0,0,0,0,0.342,0.8154,0,2,4,2,4,0,0,2,0,0,0
+LOLTMNT01_281893,15.17,Annie,Wukong,Rumble,Corki,Rakan,1732,1,23,10,50,23,10,3,1,0,0,0,0.7968,1.1432,0,1,2,1,2,0,0,0,0,0,1
+LOLTMNT01_281906,15.17,Taliyah,Xin Zhao,Ambessa,Zeri,Rell,1710,1,15,5,37,15,5,0,0,0,0,1,0.5263,0.7018,1,3,1,3,1,1,0,0,1,1,0
+LOLTMNT01_282298,15.17,Aurora,Lucian,Braum,Gwen,Naafiri,1993,0,22,23,47,22,23,2,0,0,0,1,0.6623,1.3547,1,3,1,3,1,0,0,1,0,1,1
