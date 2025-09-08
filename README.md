@@ -16,11 +16,10 @@ Ryu / Joker / Clear / Raptor / VicLa / Diable / Kellin
 
 ## 개발자 정보
 디시인사이드 BNK 피어엑스 마이너 갤러리 YeonSoo <br>
-~~사실 21년에 사고치고 해임된 주딱입니다... 몇년이 지났지만 여전히 여러분께 죄송합니다...~~ <br>
 
 GitHub: FNCT-Dev <br>
 인스타그램: in_bae_nim_hdcc <br>
 이메일: ibae2@gmu.edu / yeonang4701@naver.com
 
 ### Special Thanks To.
-이 코드를 짜는 동안 제가 실수한 걸 잡아준 ChatGPT와 제가 데이터 분석의 길을 걷게 해준 Georege Mason University Korea에 무한한 감사를 표합니다.
+수 년이 지나도록 여전히 이 팀을 사랑하게 만들어 준 조커옹 'Joker' 조재읍 코치님과, 이 코드를 짜는 동안 제가 실수한 걸 잡아준 ChatGPT, 그리고 제가 데이터 분석의 길을 걷게 입학허가를 해 주신 한국조지메이슨대학교 입학처에 무한한 감사를 표합니다.
