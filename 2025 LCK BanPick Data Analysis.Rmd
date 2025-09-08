@@ -1,0 +1,840 @@
+---
+title: "2025 LCK BanPick Data Analysis"
+output:
+  html_document:
+    theme: flatly
+    self_contained: true
+    toc: true
+    df_print: kable
+    fig_caption: true
+    number_sections: false
+    dev: svg
+mainfont: "대신 본문용 Medium"
+header-includes:
+  - \usepackage{fvextra}
+  - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+---
+
+```{r setup, include=FALSE}
+library(readr)
+library(dplyr)
+library(tidyverse)
+library(tinytex)
+```
+
+------------------------------------------------------------------------
+
+# 데이터베이스 원본 정제 및 사전작업
+
+## Step 1. 원본 데이터 내 LCK 데이터 추출 (DB)
+
+```{r, warning=FALSE}
+league <- read_csv("data/2025_LoL_esports_match_data_from_OraclesElixir.csv", show_col_types = FALSE)
+lck <- league %>%
+  filter(league == "LCK")
+lck_clean <- lck %>%
+  select(gameid, year:patch, side:playername, teamname, champion:last_col())
+```
+
+## Step 2. BFX 경기목록 추출 (Value)
+
+```{r}
+bfx_gameid <- lck_clean %>%
+  filter(teamname == "BNK FEARX", position == "team") %>%
+  distinct(gameid) %>%
+  pull(gameid)
+```
+
+------------------------------------------------------------------------
+
+# BFX 시점의 밴률, 픽률 데이터 추출
+
+## Step 1. BFX 팀 단위, 선수 단위 데이터 추출 및 정제
+
+```{r}
+bfx_only_team <- lck_clean %>%
+  filter(teamname == "BNK FEARX", position == "team") %>%
+  select(gameid, year:side, ban1:firstblood, "team kpm":hextechs) %>%
+  write_csv("data/Only/20250907 BNK FEARX Only Team.csv")
+
+bfx_only_player <- lck_clean %>%
+  filter(teamname == "BNK FEARX", position %in% c("top", "jng", "mid", "bot", "sup")) %>%
+  select(gameid, year:champion, gamelength:ckpm) %>%
+  write_csv("data/Only/20250907 BNK FEARX Only Player.csv")
+```
+
+## Step 2. BFX 팀 단위 밴 데이터 추출
+
+```{r}
+bfx_only_team_ban <- bfx_only_team %>%
+  pivot_longer(cols = ban1:ban5, names_to = "ban_order", values_to = "champ") %>%
+  group_by(champ) %>%
+  summarise(ban_count = n(), .groups = "drop") %>%
+  mutate(ban_rate = ban_count / sum(ban_count)) %>%
+  arrange(desc(ban_count)) %>%
+  write_csv("data/Only/Ban/20250907 BNK FEARX Only Team Ban.csv")
+
+bfx_only_team_ban_top30 <- bfx_only_team_ban %>%
+  slice_max(order_by = ban_count, n = 30) %>%
+  write_csv("data/Only/Ban/20250907 BNK FEARX Only Team Ban Top30.csv")
+
+bfx_only_team_ban_top30_labelw10 <- bfx_only_team_ban_top30 %>%
+  arrange(desc(ban_count)) %>%
+  mutate(rank = row_number(), group = ((rank - 1) %/% 10) + 1) %>%
+  write_csv("data/Only/Ban/20250907 BNK FEARX Only Team Ban Top30 Labelw10.csv")
+```
+
+### Step 2.1. BFX 상위 30개 밴 횟수 및 밴률 그래프
+
+```{r, fig.width=8, fig.height=6, out.width='0.9\\textwidth'}
+ggplot(bfx_only_team_ban_top30_labelw10) +
+  aes(x = reorder(champ, ban_count), y = ban_count) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = ban_count), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  facet_wrap(~group, scales = "free_y") +
+  labs(title = "BFX의 Top 30 밴리스트_횟수", x = "챔피언", y = "횟수") +
+  theme_minimal()
+
+ggplot(bfx_only_team_ban_top30_labelw10) +
+  aes(x = reorder(champ, ban_rate), y = ban_rate) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(ban_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  facet_wrap(~group, scales = "free_y") +
+  labs(title = "BFX의 Top 30 밴리스트_밴률", x = "챔피언", y = "밴률") +
+  theme_minimal()
+```
+
+## Step 3. BFX 선수별 픽 데이터 추출
+
+```{r}
+bfx_only_player_pick <- bfx_only_player %>%
+  group_by(position, playername, champion) %>%
+  summarise(pick_count = n(), win_count = sum(result == 1), win_rate = win_count / pick_count, avg_kills = mean(kills, na.rm = TRUE), avg_deaths = mean(deaths, na.rm = TRUE), avg_assists = mean(assists, na.rm = TRUE), .groups = "drop") %>%
+  arrange(position, playername, desc(pick_count)) %>%
+  write_csv("data/Only/Pick/20250907 BNK FEARX Only Player Pick.csv")
+
+bfx_only_player_pick_1_top_clear <- bfx_only_player_pick %>%
+  filter(playername == "Clear") %>%
+  mutate(pick_rate = pick_count / sum(pick_count)) %>%
+  select(champion:pick_rate) %>%
+  write_csv("data/Only/Pick/20250907 BNK FEARX Only Player Pick 1 TOP Clear.csv")
+  
+bfx_only_player_pick_1_top_soboro <- bfx_only_player_pick %>%
+  filter(playername == "Soboro") %>%
+  mutate(pick_rate = pick_count / sum(pick_count)) %>%
+  select(champion:pick_rate) %>%
+  write_csv("data/Only/Pick/20250907 BNK FEARX Only Player Pick 1 TOP Soboro.csv")
+
+bfx_only_player_pick_2_jng_raptor <- bfx_only_player_pick %>%
+  filter(playername == "Raptor") %>%
+  mutate(pick_rate = pick_count / sum(pick_count)) %>%
+  select(champion:pick_rate) %>%
+  write_csv("data/Only/Pick/20250907 BNK FEARX Only Player Pick 2 JUG Raptor.csv")
+
+bfx_only_player_pick_3_mid_vicla <- bfx_only_player_pick %>%
+  filter(playername == "VicLa") %>%
+  mutate(pick_rate = pick_count / sum(pick_count)) %>%
+  select(champion:pick_rate) %>%
+  write_csv("data/Only/Pick/20250907 BNK FEARX Only Player Pick 3 MID VicLa.csv")
+
+bfx_only_player_pick_3_mid_daystar <- bfx_only_player_pick %>%
+  filter(playername == "Daystar") %>%
+  mutate(pick_rate = pick_count / sum(pick_count)) %>%
+  select(champion:pick_rate) %>%
+  write_csv("data/Only/Pick/20250907 BNK FEARX Only Player Pick 3 MID Daystar.csv")
+
+bfx_only_player_pick_4_bot_diable <- bfx_only_player_pick %>%
+  filter(playername == "Diable") %>%
+  mutate(pick_rate = pick_count / sum(pick_count)) %>%
+  select(champion:pick_rate) %>%
+  write_csv("data/Only/Pick/20250907 BNK FEARX Only Player Pick 4 ADC Diable.csv")
+
+bfx_only_player_pick_5_sup_kellin <- bfx_only_player_pick %>%
+  filter(playername == "Kellin") %>%
+  mutate(pick_rate = pick_count / sum(pick_count)) %>%
+  select(champion:pick_rate) %>%
+  write_csv("data/Only/Pick/20250907 BNK FEARX Only Player Pick 5 SPT Kellin.csv")
+```
+
+### Step 3.1. BFX 선수별 픽률 및 승률 그래프
+
+#### Clear (TOP, 주전)
+
+```{r, fig.width=8, fig.height=6, out.width='0.9\\textwidth'}
+ggplot(bfx_only_player_pick_1_top_clear) +
+  aes(x = reorder(champion, pick_count), y = pick_count) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(pick_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  labs(title = "BFX Clear 챔피언별 픽 횟수", x = "챔피언", y = "픽 횟수") +
+  theme_minimal()
+
+ggplot(bfx_only_player_pick_1_top_clear) +
+  aes(x = reorder(champion, win_rate), y = win_rate) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(win_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  labs(title = "BFX Clear 챔피언별 승률", x = "챔피언", y = "승률") +
+  theme_minimal()
+```
+
+#### Soboro (TOP, 서브)
+
+```{r, fig.width=8, fig.height=6, out.width='0.9\\textwidth'}
+ggplot(bfx_only_player_pick_1_top_soboro) +
+  aes(x = reorder(champion, pick_count), y = pick_count) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(pick_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  labs(title = "BFX Soboro 챔피언별 픽 횟수", x = "챔피언", y = "픽 횟수") +
+  theme_minimal()
+
+ggplot(bfx_only_player_pick_1_top_soboro) +
+  aes(x = reorder(champion, win_rate), y = win_rate) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(win_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  labs(title = "BFX Soboro 챔피언별 승률", x = "챔피언", y = "승률") +
+  theme_minimal()
+```
+
+#### Raptor (JUG)
+
+```{r, fig.width=8, fig.height=6, out.width='0.9\\textwidth'}
+ggplot(bfx_only_player_pick_2_jng_raptor) +
+  aes(x = reorder(champion, pick_count), y = pick_count) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(pick_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  labs(title = "BFX Raptor 챔피언별 픽 횟수", x = "챔피언", y = "픽 횟수") +
+  theme_minimal()
+
+ggplot(bfx_only_player_pick_2_jng_raptor) +
+  aes(x = reorder(champion, win_rate), y = win_rate) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(win_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  labs(title = "BFX Raptor 챔피언별 승률", x = "챔피언", y = "승률") +
+  theme_minimal()
+```
+
+#### VicLa (MID, 주전)
+
+```{r, fig.width=8, fig.height=6, out.width='0.9\\textwidth'}
+ggplot(bfx_only_player_pick_3_mid_vicla) +
+  aes(x = reorder(champion, pick_count), y = pick_count) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(pick_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  labs(title = "BFX VicLa 챔피언별 픽 횟수", x = "챔피언", y = "픽 횟수") +
+  theme_minimal()
+
+ggplot(bfx_only_player_pick_3_mid_vicla) +
+  aes(x = reorder(champion, win_rate), y = win_rate) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(win_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  labs(title = "BFX VicLa 챔피언별 승률", x = "챔피언", y = "승률") +
+  theme_minimal()
+```
+
+#### Daystar (MID, 서브)
+
+```{r, fig.width=8, fig.height=6, out.width='0.9\\textwidth'}
+ggplot(bfx_only_player_pick_3_mid_daystar) +
+  aes(x = reorder(champion, pick_count), y = pick_count) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(pick_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  labs(title = "BFX Daystar 챔피언별 픽 횟수", x = "챔피언", y = "픽 횟수") +
+  theme_minimal()
+
+ggplot(bfx_only_player_pick_3_mid_daystar) +
+  aes(x = reorder(champion, win_rate), y = win_rate) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(win_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  labs(title = "BFX Daystar 챔피언별 승률", x = "챔피언", y = "승률") +
+  theme_minimal()
+```
+
+#### Diable (ADC)
+
+```{r}
+ggplot(bfx_only_player_pick_4_bot_diable) +
+  aes(x = reorder(champion, pick_count), y = pick_count) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(pick_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  labs(title = "BFX Diable 챔피언별 픽 횟수", x = "챔피언", y = "픽 횟수") +
+  theme_minimal()
+
+ggplot(bfx_only_player_pick_4_bot_diable) +
+  aes(x = reorder(champion, win_rate), y = win_rate) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(win_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  labs(title = "BFX Diable 챔피언별 승률", x = "챔피언", y = "승률") +
+  theme_minimal()
+```
+
+#### Kellin (SPT)
+
+```{r, fig.width=8, fig.height=6, out.width='0.9\\textwidth'}
+ggplot(bfx_only_player_pick_5_sup_kellin) +
+  aes(x = reorder(champion, pick_count), y = pick_count) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(pick_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  labs(title = "BFX Kellin 챔피언별 픽 횟수", x = "챔피언", y = "픽 횟수") +
+  theme_minimal()
+
+ggplot(bfx_only_player_pick_5_sup_kellin) +
+  aes(x = reorder(champion, win_rate), y = win_rate) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(win_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  labs(title = "BFX Kellin 챔피언별 승률", x = "챔피언", y = "승률") +
+  theme_minimal()
+```
+
+------------------------------------------------------------------------
+
+# 상대 팀 시점의 밴률, 픽률 데이터 추출
+
+## Step 4. 상대 팀의 대 BFX전 데이터 추출 및 정제
+
+```{r}
+bfx_vs_team <- lck_clean %>%
+  filter(teamname != "BNK FEARX", position == "team", gameid %in% bfx_gameid) %>%
+  select(gameid, year:side, teamname, ban1:firstblood, "team kpm":hextechs) %>%
+  write_csv("data/Versus/20250907 BNK FEARX Versus Team.csv")
+
+bfx_vs_player <- lck_clean %>%
+  filter(teamname != "BNK FEARX", position %in% c("top", "jng", "mid", "bot", "sup"), gameid %in% bfx_gameid) %>%
+  select(gameid, year:champion, gamelength:ckpm) %>%
+  write_csv("data/Versus/20250907 BNK FEARX Versus Player.csv")
+```
+
+## Step 5. 상대 팀의 대 BFX전 밴 데이터 추출
+
+```{r}
+bfx_vs_team_ban <- bfx_vs_team %>%
+  pivot_longer(cols = ban1:ban5, names_to = "ban_order", values_to = "champ") %>%
+  group_by(champ) %>%
+  summarise(ban_count = n(), .groups = "drop") %>%
+  mutate(ban_rate = ban_count / sum(ban_count)) %>%
+  arrange(desc(ban_count)) %>%
+  write_csv("data/Versus/Ban/20250907 BNK FEARX Versus Team Ban.csv")
+
+bfx_vs_team_ban_top30 <- bfx_vs_team_ban %>%
+  slice_max(order_by = ban_count, n = 30) %>%
+  write_csv("data/Versus/Ban/20250907 BNK FEARX Versus Team Ban Top30.csv")
+
+bfx_vs_team_ban_top30_labelw10 <- bfx_vs_team_ban_top30 %>%
+  arrange(desc(ban_count)) %>%
+  mutate(rank = row_number(), group = ((rank - 1) %/% 10) + 1) %>%
+  write_csv("data/Versus/Ban/20250907 BNK FEARX Versus Team Ban Top30 Labelw10.csv")
+```
+
+### Step 5.1. 상대 팀의 대 BFX전 상위 30개 밴 횟수 및 밴률 그래프
+
+```{r, fig.width=8, fig.height=6, out.width='0.9\\textwidth'}
+ggplot(bfx_vs_team_ban_top30_labelw10) +
+  aes(x = reorder(champ, ban_count), y = ban_count) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = ban_count), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  facet_wrap(~group, scales = "free_y") +
+  labs(title = "대 BFX전의 Top 30 밴리스트_횟수", x = "챔피언", y = "횟수") +
+  theme_minimal()
+
+ggplot(bfx_vs_team_ban_top30_labelw10) +
+  aes(x = reorder(champ, ban_rate), y = ban_rate) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(ban_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  facet_wrap(~group, scales = "free_y") +
+  labs(title = "대 BFX전의 Top 30 밴리스트_승률", x = "챔피언", y = "밴률") +
+  theme_minimal()
+```
+
+## Step 6. 상대 팀의 대 BFX전 포지션별 픽 데이터 추출
+
+```{r}
+bfx_vs_player_pick <- bfx_vs_player %>%
+  group_by(position, champion) %>%
+  summarise(pick_count = n(), win_count = sum(result == 1), win_rate = win_count / pick_count, avg_kills = mean(kills, na.rm = TRUE), avg_deaths = mean(deaths, na.rm = TRUE), avg_assists = mean(assists, na.rm = TRUE), .groups = "drop") %>%
+  arrange(position, desc(pick_count)) %>%
+  write_csv("data/Versus/Pick/20250907 BNK FEARX Versus Player Pick.csv")
+
+bfx_vs_player_pick_1_top <- bfx_vs_player_pick %>%
+  filter(position == "top") %>%
+  mutate(pick_rate = pick_count / sum(pick_count)) %>%
+  select(champion:pick_rate) %>%
+  write_csv("data/Versus/Pick/20250907 BNK FEARX Versus Player Pick 1 TOP.csv")
+  
+bfx_vs_player_pick_2_jng <- bfx_vs_player_pick %>%
+  filter(position == "jng") %>%
+  mutate(pick_rate = pick_count / sum(pick_count)) %>%
+  select(champion:pick_rate) %>%
+  write_csv("data/Versus/Pick/20250907 BNK FEARX Versus Player Pick 2 JUG.csv")
+
+bfx_vs_player_pick_3_mid <- bfx_vs_player_pick %>%
+  filter(position == "mid") %>%
+  mutate(pick_rate = pick_count / sum(pick_count)) %>%
+  select(champion:pick_rate) %>%
+  write_csv("data/Versus/Pick/20250907 BNK FEARX Versus Player Pick 3 MID.csv")
+
+bfx_vs_player_pick_4_bot <- bfx_vs_player_pick %>%
+  filter(position == "bot") %>%
+  mutate(pick_rate = pick_count / sum(pick_count)) %>%
+  select(champion:pick_rate) %>%
+  write_csv("data/Versus/Pick/20250907 BNK FEARX Versus Player Pick 4 ADC.csv")
+
+bfx_vs_player_pick_5_sup <- bfx_vs_player_pick %>%
+  filter(position == "sup") %>%
+  mutate(pick_rate = pick_count / sum(pick_count)) %>%
+  select(champion:pick_rate) %>%
+  write_csv("data/Versus/Pick/20250907 BNK FEARX Versus Player Pick 5 SPT.csv")
+```
+
+### Step 6.1. 대 BFX전 포지션별 픽률 및 승률 그래프
+
+#### TOP
+
+```{r, fig.width=8, fig.height=6, out.width='0.9\\textwidth'}
+ggplot(bfx_vs_player_pick_1_top) +
+  aes(x = reorder(champion, pick_count), y = pick_count) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(pick_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  labs(title = "대 BFX전 상대 탑 챔피언별 픽 횟수", x = "챔피언", y = "픽 횟수") +
+  theme_minimal()
+
+ggplot(bfx_vs_player_pick_1_top) +
+  aes(x = reorder(champion, win_rate), y = win_rate) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(win_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  labs(title = "대 BFX전 상대 탑 챔피언별 승률", x = "챔피언", y = "승률") +
+  theme_minimal()
+```
+
+#### JUG
+
+```{r, fig.width=8, fig.height=6, out.width='0.9\\textwidth'}
+ggplot(bfx_vs_player_pick_2_jng) +
+  aes(x = reorder(champion, pick_count), y = pick_count) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(pick_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  labs(title = "대 BFX전 상대 정글 챔피언별 픽 횟수", x = "챔피언", y = "픽 횟수") +
+  theme_minimal()
+
+ggplot(bfx_vs_player_pick_2_jng) +
+  aes(x = reorder(champion, win_rate), y = win_rate) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(win_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  labs(title = "대 BFX전 상대 정글 챔피언별 승률", x = "챔피언", y = "승률") +
+  theme_minimal()
+```
+
+#### MID
+
+```{r, fig.width=8, fig.height=6, out.width='0.9\\textwidth'}
+ggplot(bfx_vs_player_pick_3_mid) +
+  aes(x = reorder(champion, pick_count), y = pick_count) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(pick_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  labs(title = "대 BFX전 상대 미드 챔피언별 픽 횟수", x = "챔피언", y = "픽 횟수") +
+  theme_minimal()
+
+ggplot(bfx_vs_player_pick_3_mid) +
+  aes(x = reorder(champion, win_rate), y = win_rate) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(win_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  labs(title = "대 BFX전 상대 미드 챔피언별 승률", x = "챔피언", y = "승률") +
+  theme_minimal()
+```
+
+#### ADC
+
+```{r, fig.width=8, fig.height=6, out.width='0.9\\textwidth'}
+ggplot(bfx_vs_player_pick_4_bot) +
+  aes(x = reorder(champion, pick_count), y = pick_count) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(pick_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  labs(title = "대 BFX전 상대 원딜 챔피언별 픽 횟수", x = "챔피언", y = "픽 횟수") +
+  theme_minimal()
+
+ggplot(bfx_vs_player_pick_4_bot) +
+  aes(x = reorder(champion, win_rate), y = win_rate) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(win_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  labs(title = "대 BFX전 상대 원딜 챔피언별 승률", x = "챔피언", y = "승률") +
+  theme_minimal()
+```
+
+#### SPT
+
+```{r, fig.width=8, fig.height=6, out.width='0.9\\textwidth'}
+ggplot(bfx_vs_player_pick_5_sup) +
+  aes(x = reorder(champion, pick_count), y = pick_count) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(pick_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  labs(title = "대 BFX전 상대 서폿 챔피언별 픽 횟수", x = "챔피언", y = "픽 횟수") +
+  theme_minimal()
+
+ggplot(bfx_vs_player_pick_5_sup) +
+  aes(x = reorder(champion, win_rate), y = win_rate) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(win_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  labs(title = "대 BFX전 상대 서폿 챔피언별 승률", x = "챔피언", y = "승률") +
+  theme_minimal()
+```
+
+------------------------------------------------------------------------
+
+# 종합형 밴률, 픽률 데이터 추출
+
+## Step 7. BFX전 종합 데이터 추출 및 정제
+
+```{r}
+bfx_combi_team <- lck_clean %>%
+  filter(position == "team", gameid %in% bfx_gameid) %>%
+  select(gameid, year:side, teamname, ban1:firstblood, "team kpm":hextechs) %>%
+  write_csv("data/Combined/20250907 BNK FEARX Combinated Team.csv")
+
+bfx_combi_player <- lck_clean %>%
+  filter(position %in% c("top", "jng", "mid", "bot", "sup"), gameid %in% bfx_gameid) %>%
+  select(gameid, year:champion, gamelength:ckpm) %>%
+  write_csv("data/Combined/20250907 BNK FEARX Combined Player.csv")
+```
+
+## Step 8. BFX전 종합 밴 데이터 추출
+
+```{r}
+bfx_combi_team_ban <- bfx_combi_team %>%
+  pivot_longer(cols = ban1:ban5, names_to = "ban_order", values_to = "champ") %>%
+  group_by(champ) %>%
+  summarise(ban_count = n(), .groups = "drop") %>%
+  mutate(ban_rate = ban_count / sum(ban_count)) %>%
+  arrange(desc(ban_count)) %>%
+  write_csv("data/Combined/Ban/20250907 BNK FEARX Combined Team Ban.csv")
+
+bfx_combi_team_ban_top30 <- bfx_combi_team_ban %>%
+  slice_max(order_by = ban_count, n = 30) %>%
+  write_csv("data/Combined/Ban/20250907 BNK FEARX Combined Team Ban Top30.csv")
+
+bfx_combi_team_ban_top30_labelw10 <- bfx_combi_team_ban_top30 %>%
+  arrange(desc(ban_count)) %>%
+  mutate(rank = row_number(), group = ((rank - 1) %/% 10) + 1) %>%
+  write_csv("data/Combined/Ban/20250907 BNK FEARX Combined Team Ban Top30 Labelw10.csv")
+```
+
+### Step 8.1. BFX전 종합 상위 30개 밴 횟수 및 밴률 그래프
+
+```{r, fig.width=8, fig.height=6, out.width='0.9\\textwidth'}
+ggplot(bfx_combi_team_ban_top30_labelw10) +
+  aes(x = reorder(champ, ban_count), y = ban_count) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = ban_count), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  facet_wrap(~group, scales = "free_y") +
+  labs(title = "BFX전 종합 Top 30 밴리스트_횟수", x = "챔피언", y = "횟수") +
+  theme_minimal()
+
+ggplot(bfx_combi_team_ban_top30_labelw10) +
+  aes(x = reorder(champ, ban_rate), y = ban_rate) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(ban_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  facet_wrap(~group, scales = "free_y") +
+  labs(title = "BFX전 종합 Top 30 밴리스트_승률", x = "챔피언", y = "밴률") +
+  theme_minimal()
+```
+
+## Step 9. BFX전 종합 포지션별 픽 데이터 추출
+
+```{r}
+bfx_combi_player_pick <- bfx_combi_player %>%
+  group_by(position, champion) %>%
+  summarise(pick_count = n(), win_count = sum(result == 1), win_rate = win_count / pick_count, avg_kills = mean(kills, na.rm = TRUE), avg_deaths = mean(deaths, na.rm = TRUE), avg_assists = mean(assists, na.rm = TRUE), .groups = "drop") %>%
+  arrange(position, desc(pick_count)) %>%
+  write_csv("data/Combined/Pick/20250907 BNK FEARX Combined Player Pick.csv")
+
+bfx_combi_player_pick_1_top <- bfx_combi_player_pick %>%
+  filter(position == "top") %>%
+  mutate(pick_rate = pick_count / sum(pick_count)) %>%
+  select(champion:pick_rate) %>%
+  write_csv("data/Combined/Pick/20250907 BNK FEARX Combined Player Pick 1 TOP.csv")
+  
+bfx_combi_player_pick_2_jng <- bfx_combi_player_pick %>%
+  filter(position == "jng") %>%
+  mutate(pick_rate = pick_count / sum(pick_count)) %>%
+  select(champion:pick_rate) %>%
+  write_csv("data/Combined/Pick/20250907 BNK FEARX Combined Player Pick 2 JUG.csv")
+
+bfx_combi_player_pick_3_mid <- bfx_combi_player_pick %>%
+  filter(position == "mid") %>%
+  mutate(pick_rate = pick_count / sum(pick_count)) %>%
+  select(champion:pick_rate) %>%
+  write_csv("data/Combined/Pick/20250907 BNK FEARX Combined Player Pick 3 MID.csv")
+
+bfx_combi_player_pick_4_bot <- bfx_combi_player_pick %>%
+  filter(position == "bot") %>%
+  mutate(pick_rate = pick_count / sum(pick_count)) %>%
+  select(champion:pick_rate) %>%
+  write_csv("data/Combined/Pick/20250907 BNK FEARX Combined Player Pick 4 ADC.csv")
+
+bfx_combi_player_pick_5_sup <- bfx_combi_player_pick %>%
+  filter(position == "sup") %>%
+  mutate(pick_rate = pick_count / sum(pick_count)) %>%
+  select(champion:pick_rate) %>%
+  write_csv("data/Combined/Pick/20250907 BNK FEARX Combined Player Pick 5 SPT.csv")
+```
+
+### Step 9.1. BFX전 종합 픽률 및 승률 그래프
+
+#### TOP
+
+```{r, fig.width=8, fig.height=6, out.width='0.9\\textwidth'}
+ggplot(bfx_combi_player_pick_1_top) +
+  aes(x = reorder(champion, pick_count), y = pick_count) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(pick_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  labs(title = "BFX전 종합 탑 챔피언별 픽 횟수", x = "챔피언", y = "픽 횟수") +
+  theme_minimal()
+
+ggplot(bfx_combi_player_pick_1_top) +
+  aes(x = reorder(champion, win_rate), y = win_rate) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(win_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  labs(title = "BFX전 종합 탑 챔피언별 승률", x = "챔피언", y = "승률") +
+  theme_minimal()
+```
+
+#### JUG
+
+```{r, fig.width=8, fig.height=6, out.width='0.9\\textwidth'}
+ggplot(bfx_combi_player_pick_2_jng) +
+  aes(x = reorder(champion, pick_count), y = pick_count) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(pick_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  labs(title = "BFX전 종합 정글 챔피언별 픽 횟수", x = "챔피언", y = "픽 횟수") +
+  theme_minimal()
+
+ggplot(bfx_combi_player_pick_2_jng) +
+  aes(x = reorder(champion, win_rate), y = win_rate) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(win_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  labs(title = "BFX전 종합 정글 챔피언별 승률", x = "챔피언", y = "승률") +
+  theme_minimal()
+```
+
+#### MID
+
+```{r, fig.width=8, fig.height=6, out.width='0.9\\textwidth'}
+ggplot(bfx_combi_player_pick_3_mid) +
+  aes(x = reorder(champion, pick_count), y = pick_count) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(pick_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  labs(title = "BFX전 종합 미드 챔피언별 픽 횟수", x = "챔피언", y = "픽 횟수") +
+  theme_minimal()
+
+ggplot(bfx_combi_player_pick_3_mid) +
+  aes(x = reorder(champion, win_rate), y = win_rate) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(win_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  labs(title = "BFX전 종합 미드 챔피언별 승률", x = "챔피언", y = "승률") +
+  theme_minimal()
+```
+
+#### ADC
+
+```{r, fig.width=8, fig.height=6, out.width='0.9\\textwidth'}
+ggplot(bfx_combi_player_pick_4_bot) +
+  aes(x = reorder(champion, pick_count), y = pick_count) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(pick_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  labs(title = "BFX전 종합 원딜 챔피언별 픽 횟수", x = "챔피언", y = "픽 횟수") +
+  theme_minimal()
+
+ggplot(bfx_combi_player_pick_4_bot) +
+  aes(x = reorder(champion, win_rate), y = win_rate) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(win_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  labs(title = "BFX전 종합 원딜 챔피언별 승률", x = "챔피언", y = "승률") +
+  theme_minimal()
+```
+
+#### SPT
+
+```{r, fig.width=8, fig.height=6, out.width='0.9\\textwidth'}
+ggplot(bfx_combi_player_pick_5_sup) +
+  aes(x = reorder(champion, pick_count), y = pick_count) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(pick_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  labs(title = "BFX전 종합 서폿 챔피언별 픽 횟수", x = "챔피언", y = "픽 횟수") +
+  theme_minimal()
+
+ggplot(bfx_combi_player_pick_5_sup) +
+  aes(x = reorder(champion, win_rate), y = win_rate) +
+  geom_col(fill = "#f9d40a", color = "#000010") +
+  geom_text(aes(label = paste0(round(win_rate*100,1),"%")), hjust = 1.1, color = "#000010") +
+  coord_flip() +
+  labs(title = "BFX전 종합 서폿 챔피언별 승률", x = "챔피언", y = "승률") +
+  theme_minimal()
+```
+
+------------------------------------------------------------------------
+
+# 응용 데이터 추출
+
+## Step 10. BFX전 픽 조합 데이터 추출 및 정제
+
+### Step 10.1. 정글-미드 조합
+
+#### Step 10.1.1. BFX 시점
+
+```{r, fig.width=8, fig.height=6, out.width='0.9\\textwidth'}
+bfx_comp_only_collab_jugmid <- bfx_only_player %>%
+  filter(teamname == "BNK FEARX", position %in% c("jng", "mid")) %>%
+  select(gameid, position, playername, champion, result:ckpm) %>%
+  pivot_wider(id_cols = c(gameid,result), names_from = position,values_from = champion) %>%
+  group_by(jng, mid) %>%
+  summarise(games = n(), wins = sum(result == 1, na.rm = TRUE), winrate = wins / games, .groups = "drop") %>%
+  arrange(desc(games)) %>%
+  write_csv("data/Complicated/20250907 BNK FEARX Complicated Only Collaboration JUGMID.csv")
+
+ggplot(bfx_comp_only_collab_jugmid) +
+  aes(x = jng, y = mid, size = games, color = winrate) +
+  geom_point(alpha = 0.7) +
+  scale_color_gradient(low = "#d50110", high = "#ffd100", labels = scales::percent_format(accuracy = 1)) +
+  labs(title = "BFX 정글-미드 조합 승률 & 게임 수", x = "JUG", y = "MID", size = "게임 수", color = "승률") +
+  theme_minimal()
+```
+
+
+
+#### Step 10.1.2. 상대 팀 시점
+
+```{r, fig.width=8, fig.height=6, out.width='0.9\\textwidth'}
+bfx_comp_vs_collab_jugmid <- bfx_vs_player %>%
+  filter(teamname != "BNK FEARX", position %in% c("jng", "mid")) %>%
+  select(gameid, position:teamname, champion, result:ckpm) %>%
+  pivot_wider(id_cols = c(gameid,result), names_from = position, values_from = champion) %>%
+  group_by(jng, mid) %>%
+  summarise(games = n(), wins = sum(result == 1, na.rm = TRUE), winrate = wins / games, .groups = "drop") %>%
+  arrange(desc(games)) %>%
+  write_csv("data/Complicated/20250907 BNK FEARX Complicated Versus Collaboration JUGMID.csv")
+
+
+ggplot(bfx_comp_vs_collab_jugmid) +
+  aes(x = jng, y = mid, size = games, color = winrate) +
+  geom_point(alpha = 0.7) +
+  scale_color_gradient(low = "#d50110", high = "#ffd100", labels = scales::percent_format(accuracy = 1)) +
+  labs(title = "상대 팀 정글-미드 조합 승률 & 게임 수", x = "JUG", y = "MID", size = "게임 수", color = "승률") +
+  theme_minimal()
+```
+
+#### Step 10.1.3. BFX전 종합
+
+```{r, fig.width=8, fig.height=6, out.width='0.9\\textwidth'}
+bfx_comp_combi_collab_jugmid <- bfx_combi_player %>%
+  filter(position %in% c("jng", "mid")) %>%
+  select(gameid, position:teamname, champion, result:ckpm) %>%
+  pivot_wider(id_cols = c(gameid,result), names_from = position, values_from = champion) %>%
+  group_by(jng, mid) %>%
+  summarise(games = n(), wins = sum(result == 1, na.rm = TRUE), winrate = wins / games, .groups = "drop") %>%
+  arrange(desc(games)) %>%
+  write_csv("data/Complicated/20250907 BNK FEARX Complicated Combinated Collaboration JUGMID.csv")
+
+ggplot(bfx_comp_combi_collab_jugmid) +
+  aes(x = jng, y = mid, size = games, color = winrate) +
+  geom_point(alpha = 0.7) +
+  scale_color_gradient(low = "#d50110", high = "#ffd100", labels = scales::percent_format(accuracy = 1)) +
+  labs(title = "BFX전 종합 정글-미드 조합 승률 & 게임 수", x = "JUG", y = "MID", size = "게임 수", color = "승률") +
+  theme_minimal()
+```
+
+### Step 10.2. 원딜-서폿 조합
+
+#### Step 10.2.1. BFX 시점
+
+```{r, fig.width=8, fig.height=6, out.width='0.9\\textwidth'}
+bfx_comp_only_collab_adcspt <- bfx_only_player %>%
+  filter(teamname == "BNK FEARX", position %in% c("bot", "sup")) %>%
+  select(gameid, position, playername, champion, result:ckpm) %>%
+  pivot_wider(id_cols = c(gameid,result), names_from = position, values_from = champion) %>%
+  group_by(bot, sup) %>%
+  summarise(games = n(), wins = sum(result == 1, na.rm = TRUE), winrate = wins / games, .groups = "drop") %>%
+  arrange(desc(games)) %>%
+  write_csv("data/Complicated/20250907 BNK FEARX Complicated Only Collaboration ADCSPT.csv")
+
+ggplot(bfx_comp_only_collab_adcspt) +
+  aes(x = bot, y = sup, size = games, color = winrate) +
+  geom_point(alpha = 0.7) +
+  scale_color_gradient(low = "#d50110", high = "#ffd100", labels = scales::percent_format(accuracy = 1)) +
+  labs(title = "BFX 정글-미드 조합 승률 & 게임 수", x = "ADC", y = "SUP", size = "게임 수", color = "승률") +
+  theme_minimal()
+```
+
+#### Step 10.2.2. 상대 팀 시점
+
+```{r, fig.width=8, fig.height=6, out.width='0.9\\textwidth'}
+bfx_comp_vs_collab_adcspt <- bfx_vs_player %>%
+  filter(teamname != "BNK FEARX", position %in% c("bot", "sup")) %>%
+  select(gameid, position:teamname, champion, result:ckpm) %>%
+  pivot_wider(id_cols = c(gameid,result), names_from = position, values_from = champion) %>%
+  group_by(bot, sup) %>%
+  summarise(games = n(), wins = sum(result == 1, na.rm = TRUE), winrate = wins / games, .groups = "drop") %>%
+  arrange(desc(games)) %>%
+  write_csv("data/Complicated/20250907 BNK FEARX Complicated Versus Collaboration ADCSPT.csv")
+
+ggplot(bfx_comp_vs_collab_adcspt) +
+  aes(x = bot, y = sup, size = games, color = winrate) +
+  geom_point(alpha = 0.7) +
+  scale_color_gradient(low = "#d50110", high = "#ffd100", labels = scales::percent_format(accuracy = 1)) +
+  labs(title = "상대 팀 종합 정글-미드 조합 승률 & 게임 수", x = "ADC", y = "SUP", size = "게임 수", color = "승률") +
+  theme_minimal()
+```
+
+#### Step 10.2.3. BFX전 종합
+
+```{r, fig.width=8, fig.height=6, out.width='0.9\\textwidth'}
+bfx_comp_combi_collab_adcspt <- bfx_combi_player %>%
+  filter(position %in% c("bot", "sup")) %>%
+  select(gameid, position:teamname, champion, result:ckpm) %>%
+  pivot_wider(id_cols = c(gameid,result), names_from = position, values_from = champion) %>%
+  group_by(bot, sup) %>%
+  summarise(games = n(), wins = sum(result == 1, na.rm = TRUE), winrate = wins / games, .groups = "drop") %>%
+  arrange(desc(games)) %>%
+  write_csv("data/Complicated/20250907 BNK FEARX Complicated Combinated Collaboration ADCSPT.csv")
+
+ggplot(bfx_comp_combi_collab_adcspt) +
+  aes(x = bot, y = sup, size = games, color = winrate) +
+  geom_point(alpha = 0.7) +
+  scale_color_gradient(low = "#d50110", high = "#ffd100", labels = scales::percent_format(accuracy = 1)) +
+  labs(title = "BFX전 종합 정글-미드 조합 승률 & 게임 수", x = "ADC", y = "SUP", size = "게임 수", color = "승률") +
+  theme_minimal()
+```
